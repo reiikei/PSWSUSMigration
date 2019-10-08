@@ -85,8 +85,10 @@ Function Import-WSUSOptions {
         $WSUSConf.AutoRefreshUpdateApprovalsDeclineExpired = $ImportConf[4].AutoRefreshUpdateApprovalsDeclineExpired
 
         $WSUSConf.TargetingMode = $ImportConf[5].TargetingMode
-
-        $WSUSConf.DoDetailedRollup = $ImportConf[6].DoDetailedRollup
+        
+        if ($WSUSConf.IsReplicaServer -eq $false) {
+            $WSUSConf.DoDetailedRollup = $ImportConf[6].DoDetailedRollup
+        }
 
         $WSUSConf.MURollupOptin = $ImportConf[8].MURollupOptin
 
@@ -146,74 +148,77 @@ Function Import-WSUSOptions {
         }
 
         Write-Host "Set WSUS Subscriptions successfully."
-        Write-Host "Try to create Update Rules."
 
-        # Delete current Install Approval Rules 
+        if ($WSUSConf.IsReplicaServer -eq $false) {
+            Write-Host "Try to create Update Rules."
 
-        foreach ($OldInstallApprovalRule in $OldInstallApprovalRules) {
-            $WSUS.DeleteInstallApprovalRule($OldInstallApprovalRule.Id)
-        }
+            # Delete current Install Approval Rules 
 
-        # Create new Install Approval Rules from an imported XML
-        foreach ($NewInstallApprovalRule in $ImportConf[4].UpdateRules) {
-            $NewInstallApprovalRuleName = $NewInstallApprovalRule.Name
-            Write-Host "Try to create $NewInstallApprovalRuleName."
+            foreach ($OldInstallApprovalRule in $OldInstallApprovalRules) {
+                $WSUS.DeleteInstallApprovalRule($OldInstallApprovalRule.Id)
+            }
 
-            $IARCategories = New-Object -TypeName Microsoft.UpdateServices.Administration.UpdateCategoryCollection
+            # Create new Install Approval Rules from an imported XML
+            foreach ($NewInstallApprovalRule in $ImportConf[4].UpdateRules) {
+                $NewInstallApprovalRuleName = $NewInstallApprovalRule.Name
+                Write-Host "Try to create $NewInstallApprovalRuleName."
 
-            foreach ($Product in $NewInstallApprovalRule.Categories) {
-                if ($Product.Id -ne $null) {
-                    Try {
-                        $IARCategories.AddRange($WSUS.GetUpdateCategory($Product.Id))
-                    } Catch {
-                        Write-Warning "$Product may not be existed on this WSUS server. If you have not done WSUS synchronization, it may be added by doing WSUS synchronization."
-                        Write-Verbose "$error[0]"
+                $IARCategories = New-Object -TypeName Microsoft.UpdateServices.Administration.UpdateCategoryCollection
+
+                foreach ($Product in $NewInstallApprovalRule.Categories) {
+                    if ($Product.Id -ne $null) {
+                        Try {
+                            $IARCategories.AddRange($WSUS.GetUpdateCategory($Product.Id))
+                        } Catch {
+                            Write-Warning "$Product may not be existed on this WSUS server. If you have not done WSUS synchronization, it may be added by doing WSUS synchronization."
+                            Write-Verbose "$error[0]"
+                        }
                     }
                 }
-            }
 
-            $IARClassifications = New-Object -TypeName Microsoft.UpdateServices.Administration.UpdateClassificationCollection
+                $IARClassifications = New-Object -TypeName Microsoft.UpdateServices.Administration.UpdateClassificationCollection
 
-            foreach ($Classification in $NewInstallApprovalRule.Classifications) {
-                if ($Classification.Id -ne $null) {
-                    Try {
-                        $IARClassifications.AddRange($WSUS.GetUpdateClassification($Classification.Id))
-                    } Catch {
-                        Write-Warning "$Classification may not be existed on this WSUS server. If you have not done WSUS synchronization, it may be added by doing WSUS synchronization."
-                        Write-Verbose "$error[0]"
+                foreach ($Classification in $NewInstallApprovalRule.Classifications) {
+                    if ($Classification.Id -ne $null) {
+                        Try {
+                            $IARClassifications.AddRange($WSUS.GetUpdateClassification($Classification.Id))
+                        } Catch {
+                            Write-Warning "$Classification may not be existed on this WSUS server. If you have not done WSUS synchronization, it may be added by doing WSUS synchronization."
+                            Write-Verbose "$error[0]"
+                        }
                     }
                 }
-            }
 
-            $IARComputerTargetGroups = New-Object -TypeName Microsoft.UpdateServices.Administration.ComputerTargetGroupCollection
+                $IARComputerTargetGroups = New-Object -TypeName Microsoft.UpdateServices.Administration.ComputerTargetGroupCollection
 
-            foreach ($ComputerTargetGroup in $NewInstallApprovalRule.ComputerTargetGroups) {
-                $TmpCTG = $ExistComputerTargetGroups | Where {$_.Name -eq $ComputerTargetGroup.Name}
+                foreach ($ComputerTargetGroup in $NewInstallApprovalRule.ComputerTargetGroups) {
+                    $TmpCTG = $ExistComputerTargetGroups | Where {$_.Name -eq $ComputerTargetGroup.Name}
 
-                if ($TmpCTG -eq $null) { 
-                    $ComputerTargetGroupName = $ComputerTargetGroup.Name
-                    Write-Warning "$ComputerTargetGroupName may not be existed on this WSUS server. You need to create the computer group because $NewInstallApprovalRuleName uses."
-                } else {
-                    $IARComputerTargetGroups.AddRange($TmpCTG)
+                    if ($TmpCTG -eq $null) { 
+                        $ComputerTargetGroupName = $ComputerTargetGroup.Name
+                        Write-Warning "$ComputerTargetGroupName may not be existed on this WSUS server. You need to create the computer group because $NewInstallApprovalRuleName uses."
+                    } else {
+                        $IARComputerTargetGroups.AddRange($TmpCTG)
+                    }
                 }
-            }
-            Try {
-                $NewIAR = $WSUS.CreateInstallApprovalRule($NewInstallApprovalRule.Name)
-                $NewIAR.Enabled = $NewInstallApprovalRule.Enabled
-                $NewIAR.SetCategories($IARCategories)
-                $NewIAR.SetUpdateClassifications($IARClassifications)
-                $NewIAR.SetComputerTargetGroups($IARComputerTargetGroups)
-                $NewIAR.Deadline = $NewInstallApprovalRule.Deadline
-                $NewIAR.Save()
-            } Catch {
-                Write-Error "$error[0]"
-                Return
-            }
+                Try {
+                    $NewIAR = $WSUS.CreateInstallApprovalRule($NewInstallApprovalRule.Name)
+                    $NewIAR.Enabled = $NewInstallApprovalRule.Enabled
+                    $NewIAR.SetCategories($IARCategories)
+                    $NewIAR.SetUpdateClassifications($IARClassifications)
+                    $NewIAR.SetComputerTargetGroups($IARComputerTargetGroups)
+                    $NewIAR.Deadline = $NewInstallApprovalRule.Deadline
+                    $NewIAR.Save()
+                } Catch {
+                    Write-Error "$error[0]"
+                    Return
+                }
 
-            Write-Host "Createted $NewInstallApprovalRuleName successfully."
+                Write-Host "Createted $NewInstallApprovalRuleName successfully."
+            }
+            Write-Host "Createted all Update Rules successfully."
         }
-
-        Write-Host "Createted all Update Rules successfully."
+        
         Write-Host "Try to set WSUS Email Notification Configurations."
 
         $WSUSEmailConf.SendSyncNotification = $ImportConf[7].SendSyncNotification
