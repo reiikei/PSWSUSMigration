@@ -230,10 +230,12 @@ Function Import-WSUSOptions {
         
         Try {
             if ($ImportConf[7].SyncNotificationRecipients -ne $null) {
+                $WSUSEmailConf.SyncNotificationRecipients.Clear()
                 $WSUSEmailConf.SyncNotificationRecipients.Add($ImportConf[7].SyncNotificationRecipients)
             }
 
             if ($ImportConf[7].StatusNotificationRecipients -ne $null) {
+                $WSUSEmailConf.StatusNotificationRecipients.Clear()
                 $WSUSEmailConf.StatusNotificationRecipients.Add($ImportConf[7].StatusNotificationRecipients)
             }
 
