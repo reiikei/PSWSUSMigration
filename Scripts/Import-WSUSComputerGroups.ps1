@@ -101,7 +101,7 @@ Function Import-WSUSComputerGroups {
         }
 
         # $SystemComputerTargetGroup will be 2 groups (All Computers & Unassinged Computers).
-        if ($SystemComputerTargetGroup -ne 2){
+        if ($SystemComputerTargetGroup.Count -ne 2){
             Write-Error "Failed to delete some computer groups. $SystemComputerTargetGroup"
         }
 
