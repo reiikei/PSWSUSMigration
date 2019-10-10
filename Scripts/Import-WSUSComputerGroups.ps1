@@ -1,3 +1,15 @@
+Function New-WSUSComputerGroupsRecursive($ImportComputerGroupName, $ParentComputerGroup, $ImportComputerGroups, $WSUS) {
+    $NewComputerTargetGroup = $WSUS.CreateComputerTargetGroup($ImportComputerGroupName, $ParentComputerGroup)
+    $ChildComputerTargetGroups = $ImportComputerGroups | Where-Object {$_.ParentComputerTargetGroupName -eq $NewComputerTargetGroup.Name}
+
+    if ($null -ne $ChildComputerTargetGroups)
+    {
+        foreach ($ChildComputerTargetGroup in $ChildComputerTargetGroups) {
+            New-WSUSComputerGroupsRecursive($ChildComputerTargetGroup.ComputerTargetGroupName, $NewComputerTargetGroup, $ImportComputerGroups, $WSUS)
+        }
+    }
+}
+
 Function Import-WSUSComputerGroups {
     <#  
     .SYNOPSIS  
@@ -73,11 +85,18 @@ Function Import-WSUSComputerGroups {
 
         Try {
             $AllComputersGroup = $SystemComputerTargetGroup[0].GetParentTargetGroup()
+            $UnassingedComputersGroup = $SystemComputerTargetGroup[0]
         } Catch {
             $AllComputersGroup =  $SystemComputerTargetGroup[0]
+            $UnassingedComputersGroup = $SystemComputerTargetGroup[1]
         }
 
-        foreach 
+        $ImportedAllComputersGroup = $ImportComputerGroups | Where-Object {$null -eq $_.ParentComputerTargetGroupName}
 
+        foreach ($ImportComputerGroup in $ImportComputerGroups) {
+            if (($ImportComputerGroup.ParentComputerTargetGroupName -eq $ImportedAllComputersGroup.ComputerTargetGroupName) -And ($UnassingedComputersGroup.Name -ne $ImportComputerGroup.ComputerTargetGroupName)) {
+                    New-WSUSComputerGroupsRecursive($ImportComputerGroup.ComputerTargetGroupName, $AllComputersGroup, $ImportComputerGroups, $WSUS)
+            }
+        }
     }
 }
