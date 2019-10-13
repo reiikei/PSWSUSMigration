@@ -166,7 +166,7 @@ Function Import-WSUSOptions {
                 $IARCategories = New-Object -TypeName Microsoft.UpdateServices.Administration.UpdateCategoryCollection
 
                 foreach ($Product in $NewInstallApprovalRule.Categories) {
-                    if ($Product.Id -ne $null) {
+                    if ($null -ne $Product.Id) {
                         Try {
                             $IARCategories.AddRange($WSUS.GetUpdateCategory($Product.Id))
                         } Catch {
@@ -179,7 +179,7 @@ Function Import-WSUSOptions {
                 $IARClassifications = New-Object -TypeName Microsoft.UpdateServices.Administration.UpdateClassificationCollection
 
                 foreach ($Classification in $NewInstallApprovalRule.Classifications) {
-                    if ($Classification.Id -ne $null) {
+                    if ($null -ne $Classification.Id) {
                         Try {
                             $IARClassifications.AddRange($WSUS.GetUpdateClassification($Classification.Id))
                         } Catch {
@@ -192,9 +192,9 @@ Function Import-WSUSOptions {
                 $IARComputerTargetGroups = New-Object -TypeName Microsoft.UpdateServices.Administration.ComputerTargetGroupCollection
 
                 foreach ($ComputerTargetGroup in $NewInstallApprovalRule.ComputerTargetGroups) {
-                    $TmpCTG = $ExistComputerTargetGroups | Where {$_.Name -eq $ComputerTargetGroup.Name}
+                    $TmpCTG = $ExistComputerTargetGroups | Where-Object {$_.Name -eq $ComputerTargetGroup.Name}
 
-                    if ($TmpCTG -eq $null) { 
+                    if ($null -eq $TmpCTG) { 
                         $ComputerTargetGroupName = $ComputerTargetGroup.Name
                         Write-Warning "$ComputerTargetGroupName may not be existed on this WSUS server. You need to create the computer group because $NewInstallApprovalRuleName uses."
                     } else {
@@ -234,12 +234,12 @@ Function Import-WSUSOptions {
         $WSUSEmailConf.SmtpUserName = $ImportConf[7].SmtpUserName
         
         Try {
-            if ($ImportConf[7].SyncNotificationRecipients -ne $null) {
+            if ($null -ne $ImportConf[7].SyncNotificationRecipients) {
                 $WSUSEmailConf.SyncNotificationRecipients.Clear()
                 $WSUSEmailConf.SyncNotificationRecipients.Add($ImportConf[7].SyncNotificationRecipients)
             }
 
-            if ($ImportConf[7].StatusNotificationRecipients -ne $null) {
+            if ($null -ne $ImportConf[7].StatusNotificationRecipients) {
                 $WSUSEmailConf.StatusNotificationRecipients.Clear()
                 $WSUSEmailConf.StatusNotificationRecipients.Add($ImportConf[7].StatusNotificationRecipients)
             }
