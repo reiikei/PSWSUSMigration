@@ -26,15 +26,38 @@ Get-Command -Module PSWSUSMigration
 ```
 
 ## Example usage : Export-WSUSOptions & Import-WSUSOptions
-Export WSUS options that can be set from WSUS administration console to a XML file.
+Export all WSUS options ([Update Source and Proxy Server], [Products and Classifications] and so on) that can be set from WSUS administration console to a XML file.
 ```PowerShell
 Export-WSUSOptions -XmlPath <XML file path to export>
 ```
+if above command is successfully completed, a XML file which contains WSUS options is exported to XMLPath.
 
-Import WSUS options from a XML file exported by using "Export-WSUSOptions".
+Import WSUS options to other WSUS servers from a XML file exported by using "Export-WSUSOptions".
 ```PowerShell
-Import-WSUSOptions -XmlPath <XML file path exported using Export-WSUSOptions>
+Import-WSUSOptions -XmlPath <XML file path exported by using Export-WSUSOptions>
 ```
 
 ## Example usage : Export-WSUSComputerGroups & Import-WSUSComputerGroups
+Export WSUS computer group infromation to a XML file.
+```PowerShell
+Export-WSUSComputerGroups -XmlPath <XML file path to export>
+```
+If you use -IncludeComputerMembership option, you can include computer membership information to a XML file
+```PowerShell
+Export-WSUSComputerGroups -XmlPath <XML file path to export> -IncludeComputerMembership
+```
+if above commands are successfully completed, a XML file which contains WSUS computer group infromation is exported to XMLPath.
+
+Import WSUS computer group infromation to other WSUS servers from a XML file.
+<font color="Red">**Caution : This command will delete currently exists computer groups.**</font>
+```PowerShell
+Import-WSUSComputerGroups -XmlPath <XML file path to export>
+```
+
+If you used -IncludeComputerMembership option when exporting, you can also import computer membership infomation using -IncludeComputerMembership option.
+```PowerShell
+Import-WSUSComputerGroups -XmlPath <XML file path to export> -IncludeComputerMembership
+```
+
 ## Example usage : Export-WSUSUpdateApprovals & Import-WSUSUpdateApprovals
+

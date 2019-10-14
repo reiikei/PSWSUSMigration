@@ -35,10 +35,10 @@ Function New-WSUSComputerGroupsRecursive($ImportComputerGroup, $ParentComputerGr
 Function Import-WSUSComputerGroups {
     <#  
     .SYNOPSIS  
-        Import WSUS computer group infromation to a XML file.
+        Import WSUS computer group infromation from a XML file.
 
     .DESCRIPTION
-        Import WSUS computer group infromation to a XML file.
+        Import WSUS computer group infromation from a XML file.
 
     .NOTES  
         Name: Import-WSUSComputerGroups
