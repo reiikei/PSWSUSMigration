@@ -52,12 +52,12 @@ if above commands are successfully completed, a XML file which contains WSUS com
 
 Import WSUS computer group infromation to other WSUS servers from a XML file. **Import-WSUSComputerGroups will delete currently exists computer groups on a WSUS server.**
 ```PowerShell
-Import-WSUSComputerGroups -XmlPath <XML file path to export>
+Import-WSUSComputerGroups -XmlPath <XML file path exported by using Export-WSUSComputerGroups>
 ```
 
 If you used -IncludeComputerMembership option when exporting, you can also import computer membership infomation using -IncludeComputerMembership option.
 ```PowerShell
-Import-WSUSComputerGroups -XmlPath <XML file path to export> -IncludeComputerMembership
+Import-WSUSComputerGroups -XmlPath <XML file path exported by using Export-WSUSComputerGroups> -IncludeComputerMembership
 ```
 
 ## Example usage : Export-WSUSUpdateApprovals & Import-WSUSUpdateApprovals
@@ -73,9 +73,9 @@ if above commands are successfully completed, a XML file which contains WSUS upd
 
 Import WSUS all update approval infomation from a XML file.
 ```PowerShell
-Import-WSUSUpdateApprovals -XmlPath <XML file path to export> -All
+Import-WSUSUpdateApprovals -XmlPath <XML file path exported by using Export-WSUSUpdateApprovals> -All
 ```
 If you used -TargetComputerGroup option when exporting, you can also import update approval infomation to specifified group -TargetComputerGroup using option.
 ```PowerShell
-Export-WSUSUpdateApprovals -XmlPath <XML file path to export> -TargetComputerGroup <Computer group name>
+Import-WSUSUpdateApprovals -XmlPath <XML file path exported by using Export-WSUSUpdateApprovals>  -TargetComputerGroup <Computer group name>
 ```
