@@ -50,7 +50,7 @@ Export-WSUSComputerGroups -XmlPath <XML file path to export> -IncludeComputerMem
 ```
 if above commands are successfully completed, a XML file which contains WSUS computer group infromation is exported to XMLPath.
 
-Import WSUS computer group infromation to other WSUS servers from a XML file.**Import-WSUSComputerGroups will delete currently exists computer groups on a WSUS server.**
+Import WSUS computer group infromation to other WSUS servers from a XML file. **Import-WSUSComputerGroups will delete currently exists computer groups on a WSUS server.**
 ```PowerShell
 Import-WSUSComputerGroups -XmlPath <XML file path to export>
 ```
