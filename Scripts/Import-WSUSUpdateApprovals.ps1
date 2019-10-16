@@ -50,8 +50,9 @@ Function Import-WSUSUpdateApprovals {
         Write-Host "Connected WSUS successfully."
 
         $ComputerTargetGroup = $ComputerTargetGroups | Where-Object {$_.Name -eq $TargetComputerGroupName}
-        if ($null -eq $ComputerTargetGroup) {
+        if (($All -eq $false) -And ($null -eq $ComputerTargetGroup)) {
             Write-Error "$ComputerTargetGroupName is not existed on this WSUS server."
+            Return
         }
 
         Write-Host "Start to import update approval information."
