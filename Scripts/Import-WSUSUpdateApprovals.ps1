@@ -69,7 +69,10 @@ Function Import-WSUSUpdateApprovals {
                 Try {
                     $Update = $WSUS.GetUpdate($UpdateRevisionId)
                 } Catch {
-                    Write-Warning "$UpdateTitle is not existed on this WSUS Server."
+                    $UpdateId = $UpdateRevisionId.UpdateId
+                    $RevisionNumber = $UpdateRevisionId.RevisionNumber
+                    Write-Warning "$UpdateTitle : $UpdateId : $RevisionNumber is not existed on this WSUS Server."
+                    $Update = $null
                 }
 
                 if ($null -ne $Update) { 
