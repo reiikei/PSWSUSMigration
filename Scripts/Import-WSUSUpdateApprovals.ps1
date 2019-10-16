@@ -51,7 +51,7 @@ Function Import-WSUSUpdateApprovals {
 
         $ComputerTargetGroup = $ComputerTargetGroups | Where-Object {$_.Name -eq $TargetComputerGroupName}
         if (($All -eq $false) -And ($null -eq $ComputerTargetGroup)) {
-            Write-Error "$ComputerTargetGroupName is not existed on this WSUS server."
+            Write-Error "$TargetComputerGroupName is not existed on this WSUS server."
             Return
         }
 
@@ -91,16 +91,21 @@ Function Import-WSUSUpdateApprovals {
                             if ($null -eq $ComputerTargetGroup) {
                                 Write-Error "$ComputerTargetGroupName is not existed on this WSUS server."
                             }
+                        } else {
+                            $ComputerTargetGroupName = $TargetComputerGroupName
                         }
                         
-                        # Deadline is not need to set if it is deafault values ([DateTime]3155378975999999999).
-                        if ($ImportUpdateApproval.Deadline -eq ([DateTime]3155378975999999999)) {
-                            $Update.Approve($ApprovalAction, $ComputerTargetGroup) | Out-Null
-                            Write-Host "$UpdateTitle is $ApprovalAction to $ComputerTargetGroupName."
+                        if ($null -eq $ComputerTargetGroup) {
                         } else {
-                            $Deadline = $ImportUpdateApproval.Deadline
-                            $Update.Approve($ApprovalAction, $ComputerTargetGroup, $Deadline) | Out-Null
-                            Write-Host "$UpdateTitle is $ApprovalAction to $ComputerTargetGroupName and set deadline as $Deadline."
+                            # Deadline is not need to set if it is deafault values ([DateTime]3155378975999999999).
+                            if ($ImportUpdateApproval.Deadline -eq ([DateTime]3155378975999999999)) {
+                                $Update.Approve($ApprovalAction, $ComputerTargetGroup) | Out-Null
+                                Write-Host "$UpdateTitle is $ApprovalAction to $ComputerTargetGroupName."
+                            } else {
+                                $Deadline = $ImportUpdateApproval.Deadline
+                                $Update.Approve($ApprovalAction, $ComputerTargetGroup, $Deadline) | Out-Null
+                                Write-Host "$UpdateTitle is $ApprovalAction to $ComputerTargetGroupName and set deadline as $Deadline."
+                            }
                         }
                     }
                 }
