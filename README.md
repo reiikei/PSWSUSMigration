@@ -8,13 +8,13 @@ Powershell module to help WSUS (Windows Server Update Services) servers migratio
 - WSUS (Windows Server Update Services) installed environment
 
 ## Installing from PowerShell Gallery
-1. Install PSWSUSMigration module from: https://www.powershellgallery.com/packages/?
+1. Install PSWSUSMigration module from: https://www.powershellgallery.com/packages/PSWSUSMigration/
 ```PowerShell
 Install-Module -Name PSWSUSMigration
 ```
 
 ## Installing from ZIP file
-Download the [ZIP file](https://github.com/reiikei/PSWSUSMigration/archive/stable.zip?) of the latest release and unpack it and copy it to WSUS server you want to use this module. You can import the module like following.
+Download the [ZIP file](https://github.com/reiikei/PSWSUSMigration/archive/0.9.0.zip) of the latest release and unpack it and copy it to WSUS server you want to use this module. You can import the module like following.
 ```PowerShell
 Import-Module <Folder path>\PSWSUSMigration.psd1
 ```
